@@ -670,12 +670,7 @@ static int parse_argv(int argc, char *argv[]) {
                                 n++;
                         }
 
-                        if (n < 2) {
-                                log_error("--overlay= needs at least two colon-separated directories specified.");
-                                return -EINVAL;
-                        }
-
-                        if (n == 2) {
+                        if (n < 3) {
                                 /* If two parameters are specified,
                                  * the first one is the lower, the
                                  * second one the upper directory. And
@@ -684,7 +679,15 @@ static int parse_argv(int argc, char *argv[]) {
                                 upper = lower[1];
                                 lower[1] = NULL;
 
-                                destination = strdup(upper);
+                                /* If one parameter is specified,
+                                 * this will be the upper directory
+                                 * on the host. The lower and destionation
+                                 * will be / inside the container */
+                                if (n == 1)
+                                        destination = strdup("/");
+                                else
+                                        destination = strdup(upper);
+
                                 if (!destination)
                                         return log_oom();
 
